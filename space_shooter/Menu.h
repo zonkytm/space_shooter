@@ -147,7 +147,7 @@ bool startGame() {
 	coins.setPosition(10, 30);
 	coins.setFillColor(Color::Yellow);
 
-	int coin_to_win;
+	int coin_to_boss;
 
 
 	//win and kill texts
@@ -187,8 +187,31 @@ bool startGame() {
 	//time
 	float enemy_time = 0, time_to_spawn_enemy;
 	float bullet_time = 0;
+	//game over
+	bool game_over = 0,boss_spawned=0;
 
+	if (!mode)
+	{
 
+		coin_to_boss = 5;
+		time_to_spawn_enemy = 1;
+		player1.HP = 3;
+
+	}
+	else
+	{
+		coin_to_boss = 50;
+		time_to_spawn_enemy = 0.65;
+		player1.HP = 1;
+	}
+
+	if (!is_music_on)
+	{
+		win_game_music.setVolume(0);
+		loose_game_music.setVolume(0);
+		shoot.set_volume(0);
+		enemy_sound.set_volume(0);
+	}
 	while (window.isOpen()) {
 		float time = player_clock.getElapsedTime().asMicroseconds();
 		enemy_time += player_clock.getElapsedTime().asSeconds();
@@ -198,27 +221,9 @@ bool startGame() {
 		Event event;
 		Vector2i mouse_position = Mouse::getPosition(window);
 
-		if (!mode)
-		{
 
-			coin_to_win = 25;
-			time_to_spawn_enemy = 1;
 
-		}
-		else
-		{
-			coin_to_win = 50;
-			time_to_spawn_enemy = 0.65;
-			player1.HP = 100;
-		}
 
-		if (!is_music_on)
-		{
-			win_game_music.setVolume(0);
-			loose_game_music.setVolume(0);
-			shoot.set_volume(0);
-			enemy_sound.set_volume(0);
-		}
 		while (window.pollEvent(event))
 		{
 
@@ -227,10 +232,10 @@ bool startGame() {
 			}
 			if (event.type == Event::KeyPressed)
 			{
-				if (event.key.code == Keyboard::W and player1.coin < coin_to_win and !pause and player1.entity_is_alive)
+				if (event.key.code == Keyboard::W and !game_over and !pause and player1.entity_is_alive)
 				{
 
-					entities.push_back(new Bullet(player1_image, "bullet", 101, 2, 4, 4, (float)player1.x_position, player1.entity_sprite.getGlobalBounds().top - 20));
+					entities.push_back(new Bullet(player1_image, "bullet", 101, 2, 4, 4, (float)player1.x_position, player1.entity_sprite.getGlobalBounds().top - 20,1));
 
 					shoot.play_sound();
 
@@ -263,19 +268,20 @@ bool startGame() {
 
 		}
 
-		heart.update(&player1);
 		//работает до тех пор пока игрок жив или не набрал ужное количество очков
-		if (player1.entity_is_alive and player1.coin < coin_to_win and !pause) {
-			if (enemy_time > time_to_spawn_enemy) {
-				entities.push_back(new Enemy(player1_image, "enemy", 82, 2, 6, 5, rand() % (x_window - 20) + 1, -20));
+		if (!game_over and !pause) {
+			if (enemy_time > time_to_spawn_enemy and player1.coin<coin_to_boss) {
+				entities.push_back(new Enemy(player1_image, "enemy", 82, 2, 6, 5, rand() % (x_window - 20) + 1, -20,1));
 				enemy_time = 0;
 
 			}
 
-			if (player1.coin>=coin_to_win and mode)
+			if (player1.coin>=coin_to_boss and !boss_spawned)
 			{
 				entities.clear();
-				entities.push_back(new Boss(player1_image, "Boss", 39, 61, 21, 20, x_window / 2, 20, x_window, 20));
+				
+				entities.push_back(new Boss(player1_image, "boss", 39, 61, 21, 20, rand() % (x_window - 20) + 1, 60, x_window, 20));
+				boss_spawned = 1;
 			}
 			for (Entity* i : entities)
 			{
@@ -283,26 +289,43 @@ bool startGame() {
 
 				for (Entity* j : entities)
 				{
-					if ((i)->entity_sprite.getGlobalBounds().intersects((j)->entity_sprite.getGlobalBounds()) and j->name!= i->name) {
-						(j)->entity_is_alive = 0;
-						(i)->entity_is_alive = 0;
+					if ((i)->entity_sprite.getGlobalBounds().intersects((j)->entity_sprite.getGlobalBounds()) and i->name!=j->name) {
+						
+
+
+						i->HP -= 1;
+						j->HP -= 1;
+
+
 					}
+					
 				}
-				heart_damage(player1, i, y_window, enemy_sound);
+				heart_damage(player1, i, y_window, enemy_sound,game_over);
 				i->update(time);
 			}
 			for (Entity* k : entities)
 			{
+				if (k->HP<=0)
+				{
+					k->entity_is_alive = 0;
+				}
+
 				if (k->name == "enemy" and !k->entity_is_alive)
 				{
 					enemy_sound.play_sound();
-					
 					player1.coin += 1;
+				}
+				if (k->name == "boss" and !k->entity_is_alive)
+				{
+					enemy_sound.play_sound();
+
+					player1.coin += 1000;
+					game_over = 1;
 				}
 			}
 			//лампда
-			auto newEnd = remove_if(entities.begin(), entities.end(), [](Entity* entity_liv) {
-				return entity_liv->entity_is_alive == 0;
+			auto newEnd = remove_if(entities.begin(), entities.end(), [](Entity* entity_live) {
+				return entity_live->entity_is_alive == 0;
 				});
 
 
@@ -314,6 +337,7 @@ bool startGame() {
 
 
 		}
+		heart.update(&player1);
 		window.clear();
 		BackGround.Draw_background();
 		for (Entity* i : entities) {
@@ -324,29 +348,36 @@ bool startGame() {
 		window.draw(heart.sprite);
 		coins.setString("Coins: " + to_string(player1.coin));
 		window.draw(coins);
-		if (!player1.entity_is_alive) {
-			kill_screen.Draw_text();
-			if (music_play)
-			{
-				loose_game_music.play();
-				music_play = !music_play;
-			}
+		if (game_over==true) {
+			
 
-		}
+				if (player1.coin < coin_to_boss)
+				{
+					if (music_play) {
+						loose_game_music.play();
+						music_play = !music_play;
+					}
+			
+					kill_screen.Draw_text();
+					
+				}
 
-		if (player1.coin >= coin_to_win) {
-			win_screen.Draw_text();
-			if (music_play)
-			{
-				win_game_music.play();
-				music_play = !music_play;
 
-			}
-		}
-		if (player1.coin >= coin_to_win or !player1.entity_is_alive)
-		{
+
+				else if (player1.coin >= coin_to_boss) {
+					win_screen.Draw_text();
+					if (music_play)
+					{
+						win_game_music.play();
+						music_play = !music_play;
+
+					}
+				}
+			
 			window.draw(restart_button.Get_sprite());
 		}
+
+		
 		window.draw(button.Get_sprite());
 		window.display();
 	}

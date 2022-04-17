@@ -64,20 +64,32 @@ void Enemy::update(float time) {
 		y_position += speed * time;
 
 	}
-
+	else
+	{
+		entity_is_alive = 0;
+	}
 	entity_sprite.setPosition(x_position, y_position);
 }
 
 
 
 void Boss::update(float time) {
-	speed = 0.1;
-	if (x_position > x_window or x_position < 0) {
-		speed = -speed;
+	if (entity_sprite.getPosition().x <= 0 or entity_sprite.getPosition().x >= x_window)
+	{
+		dir = abs(1 - dir);
 	}
+	speed = 0.1;
+	switch (dir)
+	{
+	case 0:
+		dx = speed;
+		break;
+	case 1:
+		dx = -speed;
+		break;
 
-	x_position += speed * time;
-	entity_sprite.setPosition(x_position, y_position);
+	}
+	entity_sprite.move(dx * time, 0);
 }
 
 

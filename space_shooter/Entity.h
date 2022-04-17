@@ -11,13 +11,13 @@ using namespace sf;
 class Entity {
 public:
 	string file;
-	int x, y, dir,x_sprite,y_sprite;
+	int x, y, dir,x_sprite,y_sprite, HP;
 	float speed, dx, dy,x_position,y_position;
 	bool entity_is_alive;
 	String name;
 	Texture entity_texture;
 	Sprite entity_sprite;
-	Entity(Image & entity_image,string name, int x, int y, int x_sprite, int y_sprite, float x_position, float y_position) {
+	Entity(Image & entity_image,string name, int x, int y, int x_sprite, int y_sprite, float x_position, float y_position, int HP) {
 		this->x_position = x_position;
 		this->y_position = y_position;
 		this->name = name;
@@ -29,6 +29,7 @@ public:
 		this->entity_is_alive = 1;
 		entity_sprite.setScale(2, 2);
 		entity_sprite.setOrigin((float)x_sprite/2, (float)y_sprite/2);
+		this->HP = HP;
 	}
 	FloatRect getRect() {
 		return FloatRect(x_position, y_position, x_sprite, y_sprite);
@@ -40,11 +41,11 @@ public:
 
 class Player: public Entity {
 public:
-	int HP;
-	int coin=0;
-	Player(Image &player_image,string name, int x, int y, int x_spite, int y_sprite, float x_position, float y_position, int HP):Entity(player_image,name,x,y, x_spite, y_sprite,x_position,y_position) {
 
-		this->HP = HP;
+	int coin=0;
+	Player(Image &player_image,string name, int x, int y, int x_spite, int y_sprite, float x_position, float y_position, int HP):Entity(player_image,name,x,y, x_spite, y_sprite,x_position,y_position,HP) {
+
+
 	}
 	void update(float time) override;
 	void interaction_with_map(int x_window);
@@ -56,7 +57,7 @@ public:
 
 class Enemy : public Entity {
 public:
-	Enemy(Image& player_image,string name, int x, int y, int x_sprite, int y_sprite, float x_position, float y_position) :Entity(player_image,name, x, y, x_sprite, y_sprite, x_position, y_position) {
+	Enemy(Image& player_image,string name, int x, int y, int x_sprite, int y_sprite, float x_position, float y_position,int HP) :Entity(player_image,name, x, y, x_sprite, y_sprite, x_position, y_position,HP) {
 
 	}
 	void update(float time) override;
@@ -68,11 +69,11 @@ public:
 
 class Boss :public Entity {
 	int x_window;
-	int HP;
+
 public:
-	Boss(Image& player_image, string name, int x, int y, int x_sprite, int y_sprite, float x_position, float y_position,int x_window,int HP) :Entity(player_image, name, x, y, x_sprite, y_sprite, x_position, y_position) {
+	Boss(Image& player_image, string name, int x, int y, int x_sprite, int y_sprite, float x_position, float y_position,int x_window,int HP) :Entity(player_image, name, x, y, x_sprite, y_sprite, x_position, y_position, HP) {
 		this->x_window = x_window;
-		this->HP = HP;
+		this->dir = 0;
 	}
 	void update(float time) override;
 
@@ -82,7 +83,7 @@ public:
 
 class Bullet : public Entity {
 public:
-	Bullet(Image& player_image,string name, int x, int y, int x_sprite, int y_sprite, float x_position, float y_position) :Entity(player_image,name, x, y, x_sprite, y_sprite, x_position, y_position) {
+	Bullet(Image& player_image,string name, int x, int y, int x_sprite, int y_sprite, float x_position, float y_position,int HP) :Entity(player_image,name, x, y, x_sprite, y_sprite, x_position, y_position,HP) {
 		player_image.createMaskFromColor(Color(0, 0, 0));
 		entity_sprite.setScale(4, 4);
 	}

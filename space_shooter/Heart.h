@@ -40,29 +40,32 @@ public:
 	}
 };
 
-void heart_damage(Player& player, Entity* enemy, int y_window,game_sounds& enemy_sound) {
+void heart_damage(Player& player, Entity* enemy, int y_window,game_sounds& enemy_sound,bool& game_over) {
 
 
-	if (enemy->y_position > y_window) {
+	if (enemy->entity_sprite.getPosition().y >= y_window) {
 		
 		player.HP -= 1;
-		enemy->entity_is_alive = 0;
 		enemy_sound.play_sound();
+		player.coin -= 1;
+		enemy->HP -= 1;
+		cout << "Problem\n";
 
 	}
 	if (player.entity_sprite.getGlobalBounds().intersects(enemy->entity_sprite.getGlobalBounds())) {
-		enemy->entity_is_alive = 0;
-		player.coin += 1;
+		enemy->HP -= 1;
+		
 		player.HP -= 1;
 		enemy_sound.play_sound();
 	}
 
 
-	if (player.HP == 0)
+	if (player.HP <= 0)
 	{
 		player.entity_is_alive = 0;
 		player.entity_sprite.setColor(Color::Red);
 		player.entity_sprite.setTextureRect(IntRect(13, 13, 10, 13));
+		game_over = 1;
 	}
 
 }
