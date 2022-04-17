@@ -16,7 +16,7 @@ void menu(RenderWindow& window, int x_window, int y_window) {
 	Image logo_image, buttons_image;
 	logo_image.loadFromFile("images/logo1.png");
 	buttons_image.loadFromFile("images/assets.png");
-
+	
 	Texture logo_texture;
 	logo_texture.loadFromImage(logo_image);
 
@@ -185,10 +185,10 @@ bool startGame() {
 
 
 	//time
-	float enemy_time = 0, time_to_spawn_enemy;
+	float enemy_time = 0, time_to_spawn_enemy=0;
 	float bullet_time = 0;
 	//game over
-	bool game_over = 0,boss_spawned=0;
+	bool game_over = 0,boss_spawned=0, boss_dead=0;
 
 	if (!mode)
 	{
@@ -236,7 +236,24 @@ bool startGame() {
 				{
 
 					entities.push_back(new Bullet(player1_image, "bullet", 101, 2, 4, 4, (float)player1.x_position, player1.entity_sprite.getGlobalBounds().top - 20,1));
+					/*
+					if (boss_spawned)
+					{
+						int x_position,y_position, sprite_y_size;
+						
+						for (Entity* i:entities)
+						{
+							if (i->name=="boss")
+							{
+								x_position = i->entity_sprite.getPosition().x;
+								y_position = i->entity_sprite.getPosition().y;
+								cout << i->entity_sprite.getPosition().x<<"\t"<< x_position << endl;
 
+								sprite_y_size = i->entity_sprite.getGlobalBounds().height;
+							}
+						}
+						entities.push_back(new Boss_Bullet(player1_image, "boss_bullet", 101, 2, 4, 4, x_position, y_position+sprite_y_size + 20, 1));
+					}*/
 					shoot.play_sound();
 
 				}
@@ -269,8 +286,8 @@ bool startGame() {
 		}
 
 		//работает до тех пор пока игрок жив или не набрал ужное количество очков
-		if (!game_over and !pause) {
-			if (enemy_time > time_to_spawn_enemy and player1.coin<coin_to_boss) {
+		if (!game_over and !pause ) {
+			if (enemy_time > time_to_spawn_enemy and !boss_spawned) {
 				entities.push_back(new Enemy(player1_image, "enemy", 82, 2, 6, 5, rand() % (x_window - 20) + 1, -20,1));
 				enemy_time = 0;
 
@@ -282,6 +299,25 @@ bool startGame() {
 				
 				entities.push_back(new Boss(player1_image, "boss", 39, 61, 21, 20, rand() % (x_window - 20) + 1, 60, x_window, 20));
 				boss_spawned = 1;
+			}
+
+
+			if (enemy_time>time_to_spawn_enemy/3 and boss_spawned)
+			{
+					int x_position, y_position, sprite_y_size;
+					for (Entity* i : entities)
+					{
+						if (i->name == "boss")
+						{
+							x_position = i->entity_sprite.getPosition().x;
+							y_position = i->entity_sprite.getPosition().y;
+							cout << i->entity_sprite.getPosition().x << "\t" << x_position << endl;
+
+							sprite_y_size = i->entity_sprite.getGlobalBounds().height;
+						}
+					}
+					entities.push_back(new Boss_Bullet(player1_image, "boss_bullet", 101, 2, 4, 4, x_position, y_position + sprite_y_size + 20, 1));
+					enemy_time = 0;
 			}
 			for (Entity* i : entities)
 			{
@@ -318,7 +354,7 @@ bool startGame() {
 				if (k->name == "boss" and !k->entity_is_alive)
 				{
 					enemy_sound.play_sound();
-
+					boss_dead = 1;
 					player1.coin += 1000;
 					game_over = 1;
 				}
@@ -364,7 +400,7 @@ bool startGame() {
 
 
 
-				else if (player1.coin >= coin_to_boss) {
+				else if (boss_dead) {
 					win_screen.Draw_text();
 					if (music_play)
 					{

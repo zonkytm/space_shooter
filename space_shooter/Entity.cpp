@@ -90,12 +90,29 @@ void Boss::update(float time) {
 
 	}
 	entity_sprite.move(dx * time, 0);
+	
 }
 
 
 void Bullet::update(float time) {
 	speed = -0.2;
 	if (y_position > 0 and entity_is_alive) {
+
+		y_position += speed * time;
+
+	}
+	else
+	{
+		entity_is_alive = 0;
+	}
+	entity_sprite.setPosition(x_position, y_position);
+}
+
+
+
+void Boss_Bullet::update(float time) {
+	speed = 0.2;
+	if (y_position <500 and entity_is_alive) {
 
 		y_position += speed * time;
 

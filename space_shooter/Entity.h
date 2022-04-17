@@ -88,12 +88,22 @@ public:
 		entity_sprite.setScale(4, 4);
 	}
 
-	void update(float time);
+	void update(float time) override;
 
 };
 
 
 
 
+class Boss_Bullet :public Bullet {
+public:
+	Boss_Bullet(Image& player_image, string name, int x, int y, int x_sprite, int y_sprite, float x_position, float y_position, int HP) :Bullet(player_image, name, x, y, x_sprite, y_sprite, x_position, y_position, HP) {
+		player_image.createMaskFromColor(Color(0, 0, 0));
+		entity_sprite.setScale(4, 4);
+		entity_sprite.setColor(Color::Green);
+	}
 
+	void update(float time) override;
+
+};
 
