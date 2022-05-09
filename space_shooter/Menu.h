@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include"Button.h"
-#include "IU.h"
+#include "UI.h"
 #include <SFML/Audio.hpp>
 using namespace sf;
 
@@ -36,7 +36,7 @@ void menu(RenderWindow& window, int x_window, int y_window) {
 	mode_button.Set_color(Color::Green);
 
 
-	Background backGrount("SpaceShooterAssetPack_BackGrounds.png");
+	Background backGround("SpaceShooterAssetPack_BackGrounds.png");
 	Sprite logo_sprite(logo_texture);
 	
 
@@ -112,7 +112,7 @@ void menu(RenderWindow& window, int x_window, int y_window) {
 
 
 
-		backGrount.Draw_background();
+		backGround.Draw_background();
 		window.draw(logo_sprite);
 		window.draw(play_button.Get_sprite());
 		window.draw(music_button.Get_sprite());
@@ -158,7 +158,7 @@ bool startGame() {
 	//pause button
 	Image image_button;
 	image_button.loadFromFile("images/first.png");
-	Button button(image_button, Vector2f(254 - 25, 5), IntRect(162, 0, 12, 13));
+	Button pause_button(image_button, Vector2f(254 - 25, 5), IntRect(162, 0, 12, 13));
 	bool pause = 0;
 	//restart button
 	Image restart_button_image;
@@ -193,7 +193,7 @@ bool startGame() {
 	if (!mode)
 	{
 
-		coin_to_boss = 5;
+		coin_to_boss = 15;
 		time_to_spawn_enemy = 1;
 		player1.HP = 3;
 
@@ -236,24 +236,6 @@ bool startGame() {
 				{
 
 					entities.push_back(new Bullet(player1_image, "bullet", 101, 2, 4, 4, (float)player1.x_position, player1.entity_sprite.getGlobalBounds().top - 20,1));
-					/*
-					if (boss_spawned)
-					{
-						int x_position,y_position, sprite_y_size;
-						
-						for (Entity* i:entities)
-						{
-							if (i->name=="boss")
-							{
-								x_position = i->entity_sprite.getPosition().x;
-								y_position = i->entity_sprite.getPosition().y;
-								cout << i->entity_sprite.getPosition().x<<"\t"<< x_position << endl;
-
-								sprite_y_size = i->entity_sprite.getGlobalBounds().height;
-							}
-						}
-						entities.push_back(new Boss_Bullet(player1_image, "boss_bullet", 101, 2, 4, 4, x_position, y_position+sprite_y_size + 20, 1));
-					}*/
 					shoot.play_sound();
 
 				}
@@ -263,14 +245,14 @@ bool startGame() {
 			{
 				if (event.key.code == Mouse::Left)
 				{
-					if (button.Get_sprite().getGlobalBounds().contains(mouse_position.x, mouse_position.y))
+					if (pause_button.Get_sprite().getGlobalBounds().contains(mouse_position.x, mouse_position.y))
 					{
 						if (pause == 0) {
-							button.Set_TextureRect(IntRect(125, 0, 12, 13));
+							pause_button.Set_TextureRect(IntRect(125, 0, 12, 13));
 							pause = !pause;
 						}
 						else {
-							button.Set_TextureRect(IntRect(162, 0, 12, 13));
+							pause_button.Set_TextureRect(IntRect(162, 0, 12, 13));
 							pause = !pause;
 						}
 					}
@@ -285,7 +267,6 @@ bool startGame() {
 
 		}
 
-		//работает до тех пор пока игрок жив или не набрал ужное количество очков
 		if (!game_over and !pause ) {
 			if (enemy_time > time_to_spawn_enemy and !boss_spawned) {
 				entities.push_back(new Enemy(player1_image, "enemy", 82, 2, 6, 5, rand() % (x_window - 20) + 1, -20,1));
@@ -311,12 +292,11 @@ bool startGame() {
 						{
 							x_position = i->entity_sprite.getPosition().x;
 							y_position = i->entity_sprite.getPosition().y;
-							cout << i->entity_sprite.getPosition().x << "\t" << x_position << endl;
-
 							sprite_y_size = i->entity_sprite.getGlobalBounds().height;
 						}
 					}
 					entities.push_back(new Boss_Bullet(player1_image, "boss_bullet", 101, 2, 4, 4, x_position, y_position + sprite_y_size + 20, 1));
+					shoot.play_sound();
 					enemy_time = 0;
 			}
 			for (Entity* i : entities)
@@ -336,7 +316,7 @@ bool startGame() {
 					}
 					
 				}
-				heart_damage(player1, i, y_window, enemy_sound,game_over);
+				heart_damage(player1, (*i), y_window, enemy_sound,game_over);
 				i->update(time);
 			}
 			for (Entity* k : entities)
@@ -373,7 +353,7 @@ bool startGame() {
 
 
 		}
-		heart.update(&player1);
+		heart.update(player1);
 		window.clear();
 		BackGround.Draw_background();
 		for (Entity* i : entities) {
@@ -381,7 +361,7 @@ bool startGame() {
 		}
 
 		window.draw(player1.entity_sprite);
-		window.draw(heart.sprite);
+		window.draw(heart.get_sprite());
 		coins.setString("Coins: " + to_string(player1.coin));
 		window.draw(coins);
 		if (game_over==true) {
@@ -414,7 +394,7 @@ bool startGame() {
 		}
 
 		
-		window.draw(button.Get_sprite());
+		window.draw(pause_button.Get_sprite());
 		window.display();
 	}
 }

@@ -146,7 +146,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="IU.h" />
+    <ClInclude Include="UI.h" />
     <ClInclude Include="Heart.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Menu.h" />

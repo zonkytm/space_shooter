@@ -4,17 +4,11 @@ using namespace std;
 using namespace sf;
 
 class Button {
-	Vector2f bPosition;
-	IntRect bSprite;
 	Texture texture;
 	Sprite sprite;
 public:
 
-
-
 	Button(Image& image, Vector2f bPosition, IntRect bSprite) {
-		this->bPosition = bPosition;
-		this->bSprite = bSprite;
 		image.createMaskFromColor(Color(255, 255, 255));
 		this->texture.loadFromImage(image);
 		sprite.setTexture(texture);

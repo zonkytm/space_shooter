@@ -31,9 +31,6 @@ public:
 		entity_sprite.setOrigin((float)x_sprite/2, (float)y_sprite/2);
 		this->HP = HP;
 	}
-	FloatRect getRect() {
-		return FloatRect(x_position, y_position, x_sprite, y_sprite);
-	}
 	virtual void update(float time) = 0;
 };
 
@@ -58,7 +55,7 @@ public:
 class Enemy : public Entity {
 public:
 	Enemy(Image& player_image,string name, int x, int y, int x_sprite, int y_sprite, float x_position, float y_position,int HP) :Entity(player_image,name, x, y, x_sprite, y_sprite, x_position, y_position,HP) {
-
+		entity_sprite.setScale(3, 3);
 	}
 	void update(float time) override;
 

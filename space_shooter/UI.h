@@ -14,12 +14,11 @@ class Background {
 
 Texture Background_texture;
 Sprite Background_srite;
-Image Background_image;
 public:
 
 Background(string File) {
-	Background_image.loadFromFile("images/"+ File);
-	Background_texture.loadFromImage(Background_image);
+
+	Background_texture.loadFromFile("images/" + File);
 	Background_srite.setTexture(Background_texture);
 	Background_srite.setTextureRect(IntRect(0, 0, 127, 254));
 	Background_srite.setScale(2, 2);
