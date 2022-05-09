@@ -46,7 +46,6 @@ void heart_damage(Player& player, Entity& enemy, int y_window,game_sounds& enemy
 		player.HP -= 1;
 		enemy_sound.play_sound();
 		player.coin -= 2;
-		enemy.HP -= 1;
 
 	}
 	if (player.entity_sprite.getGlobalBounds().intersects(enemy.entity_sprite.getGlobalBounds())) {

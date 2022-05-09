@@ -396,6 +396,7 @@ bool startGame() {
 		
 		window.draw(pause_button.Get_sprite());
 		window.display();
+
 	}
 }
 

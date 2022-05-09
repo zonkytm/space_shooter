@@ -8,31 +8,27 @@ void Player::interaction_with_map(int x_window)
 
 
 void Player::movement(float time) {
-	if (entity_is_alive) {
+	speed = 0.2;
 		if (Keyboard::isKeyPressed(Keyboard::D))
 		{
 			dir = 0;
-			speed = 0.2;
 			entity_sprite.setTextureRect(IntRect(0, 13, 9, 11));
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::A)) {
 
 			dir = 1;
-			speed = 0.2;
 			entity_sprite.setTextureRect(IntRect(28, 13, 8, 11));
 		}
-		else if (Keyboard::isKeyPressed(Keyboard::G)) {
-			entity_sprite.setPosition(0, 0);
-		}
+
 		else {
 			entity_sprite.setTextureRect(IntRect(13, 13, 10, 11));
+			speed = 0;
+			dir = 3;
 		}
-
-	}
 }
 
 void Player::update(float time) {
-	if (entity_is_alive) {
+
 		switch (dir)
 		{
 		case 0:
@@ -42,16 +38,15 @@ void Player::update(float time) {
 			dx = -speed;
 			break;
 		default:
-			dx = 0;
+			dx = speed;
 			break;
 
 		}
 		x_position += dx * time;
-		speed = 0;
-		int x_window = 127 * 2;
+		int x_window = 254;
 		interaction_with_map(x_window);
-		entity_sprite.setPosition(x_position, 254 * 2 - 26);
-	}
+		entity_sprite.setPosition(x_position, 508 - entity_sprite.getGlobalBounds().height/2);
+
 }
 
 
