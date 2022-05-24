@@ -67,17 +67,14 @@ void menu(RenderWindow& window, int x_window, int y_window) {
 				if (menu_event.key.code == Mouse::Left)
 				{
 					if (play_button.Get_sprite().getGlobalBounds().contains(mouse_position.x, mouse_position.y)) {
-						cout << "clicked\n";
 						isMenu = false;
 					}
 					else if (music_button.Get_sprite().getGlobalBounds().contains(mouse_position.x, mouse_position.y)) {
-						cout << "clicked\n";
 						is_music_on = !is_music_on;
 
 					}
 
 					else if (mode_button.Get_sprite().getGlobalBounds().contains(mouse_position.x, mouse_position.y)) {
-						cout << "clicked\n";
 						mode = !mode;
 
 					}
@@ -357,14 +354,14 @@ bool startGame() {
 		window.clear();
 		BackGround.Draw_background();
 		for (Entity* i : entities) {
-			window.draw((i)->entity_sprite); //рисуем entities объекты (сейчас это только враги)
+			window.draw((i)->entity_sprite);
 		}
 
 		window.draw(player1.entity_sprite);
 		window.draw(heart.get_sprite());
 		coins.setString("Coins: " + to_string(player1.coin));
 		window.draw(coins);
-		if (game_over==true) {
+		if (game_over) {
 			
 
 				if (player1.coin < coin_to_boss)
